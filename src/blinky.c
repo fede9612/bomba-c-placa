@@ -37,33 +37,21 @@
 
 /*==================[inclusions]=============================================*/
 
-#include "sapi.h"       // <= sAPI header
-
-/*==================[macros and definitions]=================================*/
-
-/*==================[internal data declaration]==============================*/
-
-/*==================[internal functions declaration]=========================*/
-
-/*==================[internal data definition]===============================*/
-
-/*==================[external data definition]===============================*/
-
-/*==================[internal functions definition]==========================*/
-
-/*==================[external functions definition]==========================*/
-
-#include "semaforo.h"
 #include "controlSemaforo.h"
+#include "semaforo.h"
+#include "visualizarSemaforo.h"
+#include "sapi.h"
+
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
-int main(void){
 
-   /* ------------- INICIALIZACIONES ------------- */
+int main(void) {
 
-   /* Inicializar la placa */
-   boardConfig();
+	/* ------------- INICIALIZACIONES ------------- */
 
-   /* ------------- REPETIR POR SIEMPRE ------------- */
+	/* Inicializar la placa */
+	boardConfig();
+
+	/* ------------- REPETIR POR SIEMPRE ------------- */
 //   while(1) {
 //
 //      /* Prendo el led azul */
@@ -77,21 +65,52 @@ int main(void){
 //      delay(500);
 //
 //   }
-   semaforo sem1;
-   	int * psemaforo;
-   	psemaforo = &sem1;
-   	controlSemaforo control1;
-   	int * pcontrol;
-   	pcontrol = &control1;
 
 
-   	while(1){
-   		iniciar(pcontrol, psemaforo);
-   	}
+//Semaforo
+//	semaforo sem1;
+//	int * psemaforo;
+//	psemaforo = &sem1;
+//	controlSemaforo control1;
+//	int * pcontrol;
+//	pcontrol = &control1;
+//
+//	while (1) {
+//		iniciar(pcontrol, psemaforo);
+//	}
 
-   /* NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa no es llamado
-      por ningun S.O. */
-   return 0 ;
+
+	semaforo sem1;
+	int * psemaforo;
+	psemaforo = &sem1;
+	controlSemaforo control1;
+	int * pcontrol;
+	pcontrol = &control1;
+	iniciar(pcontrol, psemaforo);
+	while (1) {
+		actualizar(pcontrol, psemaforo);
+		estadoSemaforo(psemaforo);
+		delay(1000);
+	}
+
+
+
+//Boton para prender led rojo
+//	int estado;
+//	while (1) {
+//		{
+//			int valor = gpioRead(TEC1);    //leemos el botón: false  =  LOW
+//			if (valor == 0)              // esto es que han pulsado el botón
+//			{
+//				estado = !estado;                       // cambiamos el estado
+//				gpioWrite(LED2, estado);          // escribimos el nuevo valor
+//			}
+//		}
+//	}
+
+	/* NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa no es llamado
+	 por ningun S.O. */
+	return 0;
 }
 
 /*==================[end of file]============================================*/
