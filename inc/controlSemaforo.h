@@ -23,8 +23,6 @@ typedef struct {
 	int ultimoCambio;
 }controlSemaforo;
 
-
-
 void actualizar(controlSemaforo * control, semaforo * sem);
 void iniciar(controlSemaforo * control, semaforo * sem);
 

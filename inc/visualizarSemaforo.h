@@ -15,5 +15,8 @@ typedef struct {
 }visualizarSemaforo;
 
 void estadoSemaforo(semaforo * sem);
-
+void prenderBlinky();
+void apagarBlinky();
+void prenderLed1();
+void apagarLed1();
 #endif /* PROGRAMS_BLINKY_INC_VISUALIZARSEMAFORO_H_ */

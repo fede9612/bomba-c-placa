@@ -38,19 +38,30 @@
 /*==================[inclusions]=============================================*/
 
 #include "controlSemaforo.h"
+#include "controlBlinky.h"
+#include "controlBoton.h"
 #include "semaforo.h"
+#include "boton.h"
 #include "visualizarSemaforo.h"
 #include "sapi.h"
+
+
+void prenderLedB(void) {
+	gpioToggle(LEDB);
+	gpioToggle(GPIO1);
+}
 
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
 
 int main(void) {
 
+//	botonHandler miFuncion = x;
+//	miFuncion();
 	/* ------------- INICIALIZACIONES ------------- */
 
 	/* Inicializar la placa */
 	boardConfig();
-
+	gpioInit( GPIO1, GPIO_OUTPUT );
 	/* ------------- REPETIR POR SIEMPRE ------------- */
 //   while(1) {
 //
@@ -80,19 +91,41 @@ int main(void) {
 //	}
 
 
+	//Semaforo con blinky
 	semaforo sem1;
-	int * psemaforo;
+	semaforo * psemaforo;
 	psemaforo = &sem1;
 	controlSemaforo control1;
-	int * pcontrol;
+	controlSemaforo * pcontrol;
 	pcontrol = &control1;
 	iniciar(pcontrol, psemaforo);
+
+	controlBlinky controlB;
+	controlBlinky * pcontrolBlinky;
+	pcontrolBlinky = &controlB;
+	iniciarBlinky(pcontrolBlinky, LEDR);
+
+	controlBlinky controlB2;
+	controlBlinky * pcontrolBlinky2;
+	pcontrolBlinky2 = &controlB2;
+	iniciarBlinky(pcontrolBlinky2, LEDG);
+
+	boton boton1;
+	boton * pboton;
+	pboton = &boton1;
+	controlBoton controlBoton1;
+	controlBoton * pcontrolBoton;
+	pcontrolBoton = &controlBoton1;
+	inicializarBoton(pcontrolBoton, pboton, prenderLedB);
+
 	while (1) {
 		actualizar(pcontrol, psemaforo);
 		estadoSemaforo(psemaforo);
-		delay(1000);
+		actualizarBlinky(pcontrolBlinky, 400);
+		actualizarBlinky(pcontrolBlinky2, 2000);
+		actualizarBoton(pcontrolBoton, pboton);
+		delay(1);
 	}
-
 
 
 //Boton para prender led rojo

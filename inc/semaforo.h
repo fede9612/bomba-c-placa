@@ -8,9 +8,6 @@
 #ifndef SEMAFORO_H_
 #define SEMAFORO_H_
 
-#include <string.h>
-#include <unistd.h>
-
 
 typedef struct {
 	int Rojo;

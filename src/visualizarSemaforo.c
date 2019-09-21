@@ -32,6 +32,23 @@ void estadoAmarillo(semaforo * sem) {
 	}
 }
 
+void prenderBlinky(){
+	gpioWrite(LEDR, ON);
+}
+
+void apagarBlinky(){
+	gpioWrite(LEDR, OFF);
+
+}
+
+void prenderLed1(){
+	gpioWrite(LEDB, ON);
+}
+
+void apagarLed1(){
+	gpioWrite(LEDB, OFF);
+}
+
 void estadoSemaforo(semaforo * sem) {
 	estadoRoja(sem);
 	estadoAmarillo(sem);
