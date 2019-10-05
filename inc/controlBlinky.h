@@ -22,7 +22,7 @@ typedef struct {
 
 
 
-void actualizarBlinky(controlBlinky * control, int tiempo);
+void actualizarBlinky(controlBlinky * control);
 void iniciarBlinky(controlBlinky * control, gpioMap_t led);
 
 #endif /* PROGRAMS_BLINKY_INC_CONTROLBLINKY_H_ */

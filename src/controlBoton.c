@@ -7,6 +7,7 @@
 
 #include "visualizarSemaforo.h"
 #include "controlBoton.h"
+#include "controlBlinky.h"
 #include "boton.h"
 #include "sapi.h"
 
@@ -16,7 +17,8 @@ void inicializarBoton(controlBoton * control, boton * boton, botonHandler _funci
 	boton->funcionDown = _funcionDown;
 }
 
-void actualizarBoton(controlBoton * control, boton * boton){
+void actualizarBoton(controlBoton * control, boton * boton, controlBlinky * controlAmarillo,
+					int tiempoA, controlBlinky * controlRojo, int tiempoR, int tiempoExtra){
 	int tickActual = tickRead();
 	int tiempoPasado = tickActual - control->ultimoCambioBoton;
 
@@ -26,12 +28,25 @@ void actualizarBoton(controlBoton * control, boton * boton){
 				control->estadoBoton = Falling;
 				control->ultimoCambioBoton = tickRead();
 			}
+			if(tiempoPasado >= tiempoA && gpioRead(LEDB)){
+				controlAmarillo->estadoBlinky = Prendido;
+			}
+			if(tiempoPasado >= tiempoR && gpioRead(LEDB)){
+				controlRojo->estadoBlinky = Prendido;
+				boton->funcionDown();
+				controlAmarillo->estadoBlinky = Apagado;
+			}
+			if(controlRojo->estadoBlinky == Prendido && tiempoPasado >= tiempoExtra){
+				controlRojo->estadoBlinky = Apagado;
+			}
 			break;
 		}
 		case Falling : {
 			if(tiempoPasado >= 40 && ((gpioRead(TEC1)) == 0)){
 				control->estadoBoton = Down;
 				control->ultimoCambioBoton = tickRead();
+				controlAmarillo->estadoBlinky = Apagado;
+				controlRojo->estadoBlinky = Apagado;
 				boton->funcionDown();
 			}
 			break;

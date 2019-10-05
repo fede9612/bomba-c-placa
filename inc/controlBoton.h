@@ -9,6 +9,7 @@
 #define PROGRAMS_BLINKY_INC_CONTROLBOTON_H_
 
 #include "boton.h"
+#include "controlBlinky.h"
 
 typedef struct {
 	int estadoBoton;
@@ -18,7 +19,8 @@ typedef struct {
 enum{
 	Up, Falling, Rising, Down
 };
-void actualizarBoton(controlBoton* control, boton * boton);
+void actualizarBoton(controlBoton* control, boton * boton, controlBlinky * controlA,
+					int tiempoA, controlBlinky * controlR, int tiempoR, int tiempoExtra);
 void inicializarBoton(controlBoton * control, boton * boton, botonHandler _funcionDown);
 
 #endif /* PROGRAMS_BLINKY_INC_CONTROLBOTON_H_ */

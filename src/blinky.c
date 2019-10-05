@@ -48,6 +48,7 @@
 
 void prenderLedB(void) {
 	gpioToggle(LEDB);
+	gpioWrite(LED1, OFF);
 	gpioToggle(GPIO1);
 }
 
@@ -92,23 +93,23 @@ int main(void) {
 
 
 	//Semaforo con blinky
-	semaforo sem1;
-	semaforo * psemaforo;
-	psemaforo = &sem1;
-	controlSemaforo control1;
-	controlSemaforo * pcontrol;
-	pcontrol = &control1;
-	iniciar(pcontrol, psemaforo);
-
+//	semaforo sem1;
+//	semaforo * psemaforo;
+//	psemaforo = &sem1;
+//	controlSemaforo control1;
+//	controlSemaforo * pcontrol;
+//	pcontrol = &control1;
+//	iniciar(pcontrol, psemaforo);
+//
 	controlBlinky controlB;
-	controlBlinky * pcontrolBlinky;
-	pcontrolBlinky = &controlB;
-	iniciarBlinky(pcontrolBlinky, LEDR);
+	controlBlinky * pcontrolAmarillo;
+	pcontrolAmarillo = &controlB;
+	iniciarBlinky(pcontrolAmarillo, LED1);
 
-	controlBlinky controlB2;
-	controlBlinky * pcontrolBlinky2;
-	pcontrolBlinky2 = &controlB2;
-	iniciarBlinky(pcontrolBlinky2, LEDG);
+	controlBlinky controlRojo;
+	controlBlinky * pcontrolRojo;
+	pcontrolRojo = &controlRojo;
+	iniciarBlinky(pcontrolRojo, LED2);
 
 	boton boton1;
 	boton * pboton;
@@ -119,11 +120,11 @@ int main(void) {
 	inicializarBoton(pcontrolBoton, pboton, prenderLedB);
 
 	while (1) {
-		actualizar(pcontrol, psemaforo);
-		estadoSemaforo(psemaforo);
-		actualizarBlinky(pcontrolBlinky, 400);
-		actualizarBlinky(pcontrolBlinky2, 2000);
-		actualizarBoton(pcontrolBoton, pboton);
+		//actualizar(pcontrol, psemaforo);
+		//estadoSemaforo(psemaforo);
+		actualizarBlinky(pcontrolRojo);
+		actualizarBlinky(pcontrolAmarillo);
+		actualizarBoton(pcontrolBoton, pboton, pcontrolAmarillo, 10000, pcontrolRojo, 20000, 30000);
 		delay(1);
 	}
 
