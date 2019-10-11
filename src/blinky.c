@@ -37,19 +37,50 @@
 
 /*==================[inclusions]=============================================*/
 
-#include "controlSemaforo.h"
+#include "../inc/controlBomba.h"
 #include "controlBlinky.h"
 #include "controlBoton.h"
 #include "semaforo.h"
 #include "boton.h"
 #include "visualizarSemaforo.h"
 #include "sapi.h"
+#include "controlBomba.h"
 
+#define UART_PC        UART_USB
+#define UART_BLUETOOTH UART_232
+
+
+#include "Button.h"
+#include "AppModel.h"
+#include "AppModelRender.h"
+#include "UartConnector.h"
 
 void prenderLedB(void) {
 	gpioToggle(LEDB);
-	gpioWrite(LED1, OFF);
 	gpioToggle(GPIO1);
+}
+
+
+//Este es un handler uartConnecter
+void bluetoothCommandReceived(void * appModelPointer, uint8_t byte) {
+	if(byte == 'h') {
+		appModel_enable((AppModel *)appModelPointer);
+	}
+	else if(byte == 'l') {
+		appModel_disable((AppModel *)appModelPointer);
+
+	}
+}
+
+//Este es un observer del Modelo
+void modelChanged(void * uartConnectorPointer, AppModel * model) {
+	UartConnector * uartConnector = (UartConnector *) uartConnectorPointer;
+	if(appModel_isEnabled(model)) {
+		uartConnector_send(uartConnector, "LED_ON");
+	}
+	else {
+		uartConnector_send(uartConnector, "LED_OFF");
+	}
 }
 
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
@@ -101,15 +132,24 @@ int main(void) {
 //	pcontrol = &control1;
 //	iniciar(pcontrol, psemaforo);
 //
+
+	Bomba bomba;
+	Bomba * pbomba = &bomba;
+
+	controlBomba bombaControl;
+	controlBomba * pBombaControl;
+	pBombaControl = &bombaControl;
+	iniciar(pBombaControl, pbomba);
+
 	controlBlinky controlB;
 	controlBlinky * pcontrolAmarillo;
 	pcontrolAmarillo = &controlB;
-	iniciarBlinky(pcontrolAmarillo, LED1);
+	iniciarBlinky(pcontrolAmarillo, LED1, 3000);
 
 	controlBlinky controlRojo;
 	controlBlinky * pcontrolRojo;
 	pcontrolRojo = &controlRojo;
-	iniciarBlinky(pcontrolRojo, LED2);
+	iniciarBlinky(pcontrolRojo, LED2, 6000);
 
 	boton boton1;
 	boton * pboton;
@@ -119,12 +159,29 @@ int main(void) {
 	pcontrolBoton = &controlBoton1;
 	inicializarBoton(pcontrolBoton, pboton, prenderLedB);
 
+
+	//--------------------- Bluetooth
+
+	Button button;
+	AppModel appModel;
+	AppModelRender appModelRender;
+	UartConnector uartConnector;
+
+	appModel_init(&appModel, 0);
+	appModel_setObserver(&appModel, (void *)&uartConnector, modelChanged);
+
+	appModelRender_init(&appModelRender, &appModel, LED3);
+	uartConnector_initBt(&uartConnector, &appModel, bluetoothCommandReceived);
+
 	while (1) {
 		//actualizar(pcontrol, psemaforo);
 		//estadoSemaforo(psemaforo);
 		actualizarBlinky(pcontrolRojo);
 		actualizarBlinky(pcontrolAmarillo);
-		actualizarBoton(pcontrolBoton, pboton, pcontrolAmarillo, 10000, pcontrolRojo, 20000, 30000);
+		actualizarBoton(pcontrolBoton, pboton, &appModel, pbomba);
+		actualizar(pBombaControl, pbomba, pcontrolAmarillo, pcontrolRojo);
+		appModelRender_update(&appModelRender);
+		uartConnector_update(&uartConnector);
 		delay(1);
 	}
 

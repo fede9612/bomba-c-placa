@@ -8,10 +8,18 @@
 #include "controlBlinky.h"
 #include "sapi.h"
 
-void iniciarBlinky(controlBlinky * control, gpioMap_t led){
+void iniciarBlinky(controlBlinky * control, gpioMap_t led, int tiempo){
 	control->estadoBlinky = Apagado;
-	control->ultimoCambioBlinky = tickRead();
 	control->led = led;
+	control->tiempo = tiempo;
+}
+
+void prenderBlinky(controlBlinky * control){
+	control->estadoBlinky = Prendido;
+}
+
+void apagarBlinky(controlBlinky * control){
+	control->estadoBlinky = Apagado;
 }
 
 void actualizarBlinky(controlBlinky * control){
@@ -19,12 +27,10 @@ void actualizarBlinky(controlBlinky * control){
 	switch(control->estadoBlinky){
 		case Prendido : {
 				gpioWrite(control->led, ON);
-				control->ultimoCambioBlinky = tickRead();
 			break;
 		}
 		case Apagado : {
 				gpioWrite(control->led, OFF);
-				control->ultimoCambioBlinky = tickRead();
 			break;
 		}
 	}

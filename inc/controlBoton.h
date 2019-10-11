@@ -10,17 +10,19 @@
 
 #include "boton.h"
 #include "controlBlinky.h"
+#include "AppModel.h"
+#include "bomba.h"
 
 typedef struct {
 	int estadoBoton;
 	int ultimoCambioBoton;
+	int bluetooth;
 }controlBoton;
 
 enum{
 	Up, Falling, Rising, Down
 };
-void actualizarBoton(controlBoton* control, boton * boton, controlBlinky * controlA,
-					int tiempoA, controlBlinky * controlR, int tiempoR, int tiempoExtra);
+void actualizarBoton(controlBoton* control, boton * boton, AppModel * model, Bomba * bomba);
 void inicializarBoton(controlBoton * control, boton * boton, botonHandler _funcionDown);
 
 #endif /* PROGRAMS_BLINKY_INC_CONTROLBOTON_H_ */

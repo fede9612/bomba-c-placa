@@ -6,21 +6,32 @@
  */
 
 #include "visualizarSemaforo.h"
+#include "AppModel.h"
 #include "controlBoton.h"
 #include "controlBlinky.h"
 #include "boton.h"
+#include "bomba.h"
 #include "sapi.h"
 
 void inicializarBoton(controlBoton * control, boton * boton, botonHandler _funcionDown){
 	control->estadoBoton = Up;
 	control->ultimoCambioBoton = tickRead();
 	boton->funcionDown = _funcionDown;
+	control->bluetooth = 0;
 }
 
-void actualizarBoton(controlBoton * control, boton * boton, controlBlinky * controlAmarillo,
-					int tiempoA, controlBlinky * controlRojo, int tiempoR, int tiempoExtra){
+void actualizarBoton(controlBoton * control, boton * boton, AppModel * model, Bomba * bomba){
 	int tickActual = tickRead();
 	int tiempoPasado = tickActual - control->ultimoCambioBoton;
+
+//	if(controlRojo->estadoBlinky == Prendido && tiempoPasado >= tiempoExtra){
+//		controlRojo->estadoBlinky = Apagado;
+//	}
+
+	if(bomba->estadoBomba == Apagada && gpioRead(LEDB)){
+		boton->funcionDown();
+		appModel_disable(model);
+	}
 
 	switch(control->estadoBoton){
 		case Up : {
@@ -28,16 +39,17 @@ void actualizarBoton(controlBoton * control, boton * boton, controlBlinky * cont
 				control->estadoBoton = Falling;
 				control->ultimoCambioBoton = tickRead();
 			}
-			if(tiempoPasado >= tiempoA && gpioRead(LEDB)){
-				controlAmarillo->estadoBlinky = Prendido;
-			}
-			if(tiempoPasado >= tiempoR && gpioRead(LEDB)){
-				controlRojo->estadoBlinky = Prendido;
+			if(gpioRead(LED3) && !gpioRead(LEDB)){
+				bombaPrender(bomba);
 				boton->funcionDown();
-				controlAmarillo->estadoBlinky = Apagado;
+				control->bluetooth = 1;
+				control->ultimoCambioBoton = tickRead();
 			}
-			if(controlRojo->estadoBlinky == Prendido && tiempoPasado >= tiempoExtra){
-				controlRojo->estadoBlinky = Apagado;
+			if(!gpioRead(LED3) && gpioRead(LEDB) && control->bluetooth == 1){
+				bombaApagar(bomba);
+				boton->funcionDown();
+				control->bluetooth = 0;
+				control->ultimoCambioBoton = tickRead();
 			}
 			break;
 		}
@@ -45,8 +57,7 @@ void actualizarBoton(controlBoton * control, boton * boton, controlBlinky * cont
 			if(tiempoPasado >= 40 && ((gpioRead(TEC1)) == 0)){
 				control->estadoBoton = Down;
 				control->ultimoCambioBoton = tickRead();
-				controlAmarillo->estadoBlinky = Apagado;
-				controlRojo->estadoBlinky = Apagado;
+				bombaPrender(bomba);
 				boton->funcionDown();
 			}
 			break;

@@ -16,13 +16,15 @@ enum estadoBlinky{
 
 typedef struct {
 	int estadoBlinky;
-	int ultimoCambioBlinky;
 	gpioMap_t led;
+	int tiempo;
 }controlBlinky;
 
 
 
 void actualizarBlinky(controlBlinky * control);
-void iniciarBlinky(controlBlinky * control, gpioMap_t led);
+void iniciarBlinky(controlBlinky * control, gpioMap_t led, int tiempo);
+void prenderBlinky(controlBlinky * control);
+void apagarBlinky(controlBlinky * control);
 
 #endif /* PROGRAMS_BLINKY_INC_CONTROLBLINKY_H_ */
