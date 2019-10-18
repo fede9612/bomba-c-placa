@@ -57,27 +57,6 @@ void prenderLedB(void) {
 }
 
 
-//Este es un handler uartConnecter
-//void bluetoothCommandReceived(void * appModelPointer, uint8_t byte) {
-//	if(byte == 'p') {
-//		gpioToggle(LED3);
-//	}
-//	else if(byte == 'a') {
-//		gpioToggle(LED3);
-//	}
-//}
-
-//Este es un observer del Modelo
-//void modelChanged(void * uartConnectorPointer, AppModel * model) {
-//	UartConnector * uartConnector = (UartConnector *) uartConnectorPointer;
-//	if(appModel_isEnabled(model)) {
-//		uartConnector_send(uartConnector, "LED_ON");
-//	}
-//	else {
-//		uartConnector_send(uartConnector, "LED_OFF");
-//	}
-//}
-
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
 
 int main(void) {
@@ -135,7 +114,6 @@ int main(void) {
 		actualizarBoton(pcontrolBoton, pboton, pbomba, &bluetoothControl);
 		actualizarBomba(pBombaControl, pbomba, pcontrolAmarillo, pcontrolRojo);
 		actualizarControlRemoto(&bluetoothControl, pbomba);
-		//appModelRender_update(&appModelRender);
 		uartConnector_update(&uartConnector);
 		delay(1);
 	}
