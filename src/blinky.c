@@ -37,23 +37,19 @@
 
 /*==================[inclusions]=============================================*/
 
-#include "../inc/controlBomba.h"
 #include "controlBlinky.h"
 #include "controlBoton.h"
-#include "semaforo.h"
+#include "controlRemoto.h"
 #include "boton.h"
-#include "visualizarSemaforo.h"
 #include "sapi.h"
 #include "controlBomba.h"
+#include "UartConnector.h"
+#include "model.h"
 
 #define UART_PC        UART_USB
 #define UART_BLUETOOTH UART_232
 
 
-#include "Button.h"
-#include "AppModel.h"
-#include "AppModelRender.h"
-#include "UartConnector.h"
 
 void prenderLedB(void) {
 	gpioToggle(LEDB);
@@ -62,26 +58,25 @@ void prenderLedB(void) {
 
 
 //Este es un handler uartConnecter
-void bluetoothCommandReceived(void * appModelPointer, uint8_t byte) {
-	if(byte == 'h') {
-		appModel_enable((AppModel *)appModelPointer);
-	}
-	else if(byte == 'l') {
-		appModel_disable((AppModel *)appModelPointer);
-
-	}
-}
+//void bluetoothCommandReceived(void * appModelPointer, uint8_t byte) {
+//	if(byte == 'p') {
+//		gpioToggle(LED3);
+//	}
+//	else if(byte == 'a') {
+//		gpioToggle(LED3);
+//	}
+//}
 
 //Este es un observer del Modelo
-void modelChanged(void * uartConnectorPointer, AppModel * model) {
-	UartConnector * uartConnector = (UartConnector *) uartConnectorPointer;
-	if(appModel_isEnabled(model)) {
-		uartConnector_send(uartConnector, "LED_ON");
-	}
-	else {
-		uartConnector_send(uartConnector, "LED_OFF");
-	}
-}
+//void modelChanged(void * uartConnectorPointer, AppModel * model) {
+//	UartConnector * uartConnector = (UartConnector *) uartConnectorPointer;
+//	if(appModel_isEnabled(model)) {
+//		uartConnector_send(uartConnector, "LED_ON");
+//	}
+//	else {
+//		uartConnector_send(uartConnector, "LED_OFF");
+//	}
+//}
 
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
 
@@ -95,43 +90,6 @@ int main(void) {
 	boardConfig();
 	gpioInit( GPIO1, GPIO_OUTPUT );
 	/* ------------- REPETIR POR SIEMPRE ------------- */
-//   while(1) {
-//
-//      /* Prendo el led azul */
-//      gpioWrite( LED2, ON );
-//
-//      delay(500);
-//
-//      /* Apago el led azul */
-//      gpioWrite( LED2, OFF );
-//
-//      delay(500);
-//
-//   }
-
-
-//Semaforo
-//	semaforo sem1;
-//	int * psemaforo;
-//	psemaforo = &sem1;
-//	controlSemaforo control1;
-//	int * pcontrol;
-//	pcontrol = &control1;
-//
-//	while (1) {
-//		iniciar(pcontrol, psemaforo);
-//	}
-
-
-	//Semaforo con blinky
-//	semaforo sem1;
-//	semaforo * psemaforo;
-//	psemaforo = &sem1;
-//	controlSemaforo control1;
-//	controlSemaforo * pcontrol;
-//	pcontrol = &control1;
-//	iniciar(pcontrol, psemaforo);
-//
 
 	Bomba bomba;
 	Bomba * pbomba = &bomba;
@@ -139,7 +97,10 @@ int main(void) {
 	controlBomba bombaControl;
 	controlBomba * pBombaControl;
 	pBombaControl = &bombaControl;
-	iniciar(pBombaControl, pbomba);
+	iniciarBomba(pBombaControl, pbomba);
+
+	ControlRemoto bluetoothControl;
+	iniciarControlRemoto(&bluetoothControl);
 
 	controlBlinky controlB;
 	controlBlinky * pcontrolAmarillo;
@@ -159,45 +120,25 @@ int main(void) {
 	pcontrolBoton = &controlBoton1;
 	inicializarBoton(pcontrolBoton, pboton, prenderLedB);
 
+	Model bombaYContolBomba;
+	inicializarModel(&bombaYContolBomba, pbomba, &bluetoothControl);
 
 	//--------------------- Bluetooth
 
-	Button button;
-	AppModel appModel;
-	AppModelRender appModelRender;
 	UartConnector uartConnector;
 
-	appModel_init(&appModel, 0);
-	appModel_setObserver(&appModel, (void *)&uartConnector, modelChanged);
-
-	appModelRender_init(&appModelRender, &appModel, LED3);
-	uartConnector_initBt(&uartConnector, &appModel, bluetoothCommandReceived);
+	uartConnector_initBt(&uartConnector, &bombaYContolBomba, bluetoothCommandReceived);
 
 	while (1) {
-		//actualizar(pcontrol, psemaforo);
-		//estadoSemaforo(psemaforo);
 		actualizarBlinky(pcontrolRojo);
 		actualizarBlinky(pcontrolAmarillo);
-		actualizarBoton(pcontrolBoton, pboton, &appModel, pbomba);
-		actualizar(pBombaControl, pbomba, pcontrolAmarillo, pcontrolRojo);
-		appModelRender_update(&appModelRender);
+		actualizarBoton(pcontrolBoton, pboton, pbomba, &bluetoothControl);
+		actualizarBomba(pBombaControl, pbomba, pcontrolAmarillo, pcontrolRojo);
+		actualizarControlRemoto(&bluetoothControl, pbomba);
+		//appModelRender_update(&appModelRender);
 		uartConnector_update(&uartConnector);
 		delay(1);
 	}
-
-
-//Boton para prender led rojo
-//	int estado;
-//	while (1) {
-//		{
-//			int valor = gpioRead(TEC1);    //leemos el botón: false  =  LOW
-//			if (valor == 0)              // esto es que han pulsado el botón
-//			{
-//				estado = !estado;                       // cambiamos el estado
-//				gpioWrite(LED2, estado);          // escribimos el nuevo valor
-//			}
-//		}
-//	}
 
 	/* NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa no es llamado
 	 por ningun S.O. */

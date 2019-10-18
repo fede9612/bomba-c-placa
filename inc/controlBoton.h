@@ -10,7 +10,7 @@
 
 #include "boton.h"
 #include "controlBlinky.h"
-#include "AppModel.h"
+#include "controlRemoto.h"
 #include "bomba.h"
 
 typedef struct {
@@ -22,7 +22,7 @@ typedef struct {
 enum{
 	Up, Falling, Rising, Down
 };
-void actualizarBoton(controlBoton* control, boton * boton, AppModel * model, Bomba * bomba);
+void actualizarBoton(controlBoton* control, boton * boton, Bomba * bomba, ControlRemoto * controlRemoto);
 void inicializarBoton(controlBoton * control, boton * boton, botonHandler _funcionDown);
 
 #endif /* PROGRAMS_BLINKY_INC_CONTROLBOTON_H_ */

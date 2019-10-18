@@ -8,15 +8,14 @@
 #include "../inc/controlBomba.h"
 
 #include "bomba.h"
-#include "visualizarSemaforo.h"
 #include "sapi.h"
 
-void iniciar(controlBomba * control, Bomba * bomba){
+void iniciarBomba(controlBomba * control, Bomba * bomba){
 	bombaApagar(bomba);
 	control->ultimoCambio = 0;
 }
 
-void actualizar(controlBomba * control, Bomba * bomba, controlBlinky * controlAmarillo,  controlBlinky * controlRojo) {
+void actualizarBomba(controlBomba * control, Bomba * bomba, controlBlinky * controlAmarillo,  controlBlinky * controlRojo) {
 	int tickActual = tickRead();
 	int tiempoPasado = tickActual - control->ultimoCambio;
 

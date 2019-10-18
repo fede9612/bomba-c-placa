@@ -5,32 +5,34 @@
  *      Author: federico
  */
 
-#include "visualizarSemaforo.h"
-#include "AppModel.h"
 #include "controlBoton.h"
 #include "controlBlinky.h"
+#include "controlRemoto.h"
 #include "boton.h"
 #include "bomba.h"
 #include "sapi.h"
+
+void siElBotonFuePresionado(int tiempoPasado, controlBoton * control, boton * boton, Bomba * bomba){
+	if(tiempoPasado >= 40 && ((gpioRead(TEC1)) == 0)){
+		control->estadoBoton = Down;
+		control->ultimoCambioBoton = tickRead();
+		bombaPrender(bomba);
+		boton->funcionDown();
+	}
+}
 
 void inicializarBoton(controlBoton * control, boton * boton, botonHandler _funcionDown){
 	control->estadoBoton = Up;
 	control->ultimoCambioBoton = tickRead();
 	boton->funcionDown = _funcionDown;
-	control->bluetooth = 0;
 }
 
-void actualizarBoton(controlBoton * control, boton * boton, AppModel * model, Bomba * bomba){
+void actualizarBoton(controlBoton * control, boton * boton, Bomba * bomba, ControlRemoto * controlRemoto){
 	int tickActual = tickRead();
 	int tiempoPasado = tickActual - control->ultimoCambioBoton;
 
-//	if(controlRojo->estadoBlinky == Prendido && tiempoPasado >= tiempoExtra){
-//		controlRojo->estadoBlinky = Apagado;
-//	}
-
 	if(bomba->estadoBomba == Apagada && gpioRead(LEDB)){
 		boton->funcionDown();
-		appModel_disable(model);
 	}
 
 	switch(control->estadoBoton){
@@ -39,27 +41,10 @@ void actualizarBoton(controlBoton * control, boton * boton, AppModel * model, Bo
 				control->estadoBoton = Falling;
 				control->ultimoCambioBoton = tickRead();
 			}
-			if(gpioRead(LED3) && !gpioRead(LEDB)){
-				bombaPrender(bomba);
-				boton->funcionDown();
-				control->bluetooth = 1;
-				control->ultimoCambioBoton = tickRead();
-			}
-			if(!gpioRead(LED3) && gpioRead(LEDB) && control->bluetooth == 1){
-				bombaApagar(bomba);
-				boton->funcionDown();
-				control->bluetooth = 0;
-				control->ultimoCambioBoton = tickRead();
-			}
 			break;
 		}
 		case Falling : {
-			if(tiempoPasado >= 40 && ((gpioRead(TEC1)) == 0)){
-				control->estadoBoton = Down;
-				control->ultimoCambioBoton = tickRead();
-				bombaPrender(bomba);
-				boton->funcionDown();
-			}
+			siElBotonFuePresionado(tiempoPasado, control, boton, bomba);
 			break;
 		}
 		case Down : {
@@ -79,3 +64,5 @@ void actualizarBoton(controlBoton * control, boton * boton, AppModel * model, Bo
 		}
 	}
 }
+
+

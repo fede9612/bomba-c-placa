@@ -11,17 +11,12 @@
 #include "bomba.h"
 #include "controlBlinky.h"
 
-#define TiempoRojo 7000
-#define TiempoAmarillo 3000
-#define TiempoVerde 7000
-
-
 typedef struct {
 	int estado;
 	int ultimoCambio;
 }controlBomba;
 
-void actualizar(controlBomba * control, Bomba * sem, controlBlinky * controlAmarillo,  controlBlinky * controlRojo);
-void iniciar(controlBomba * control, Bomba * sem);
+void actualizarBomba(controlBomba * control, Bomba * sem, controlBlinky * controlAmarillo,  controlBlinky * controlRojo);
+void iniciarBomba(controlBomba * control, Bomba * sem);
 
 #endif

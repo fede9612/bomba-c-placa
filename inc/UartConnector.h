@@ -9,6 +9,7 @@
 #define PROGRAMS_BTEXAMPLE_INC_UARTCONNECTOR_H_
 
 #include <sapi.h>
+#include "bomba.h"
 
 typedef void (*ByteReadedEventHandler)(void * model, uint8_t byte);
 
